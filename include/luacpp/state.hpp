@@ -19,6 +19,9 @@ class State {
   State& operator=(State&&) noexcept;
   ~State();
 
+  void dofile(const char* path);
+  void dofile(const std::string& path) { dofile(path.c_str()); }
+
  private:
   detail::tags::state_t* m_handle;
 };

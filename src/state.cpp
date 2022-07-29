@@ -1,5 +1,7 @@
 #include "luacpp/state.hpp"
 
+#include <stdexcept>
+
 extern "C" {
 #include <lauxlib.h>
 #include <lua.h>
@@ -36,4 +38,8 @@ State::~State() {
   if (m_handle) lua_close(cast(m_handle));
 }
 
+void State::dofile(const char* path) {
+  auto res = luaL_dofile(cast(m_handle), path);
+  if (res) throw std::runtime_error("Failed to execute file");
+}
 }  // namespace luacpp
