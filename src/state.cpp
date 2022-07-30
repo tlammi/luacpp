@@ -1,11 +1,28 @@
 #include "luacpp/state.hpp"
 
+#include <iostream>
 #include <stdexcept>
 
 #include "cast.hpp"
 #include "lua.hpp"
 
 namespace luacpp {
+
+namespace {
+
+int bar(lua_State* _) {
+  std::cerr << "bar called!!!!\n";
+  return 0;
+}
+
+constexpr luaL_Reg funcs[] = {{"foo", bar}, {nullptr, nullptr}};
+
+int open_nop(lua_State* s) {
+  luaL_newlib(s, funcs);
+  return 1;
+}
+
+}  // namespace
 
 State::State(flags::StateFlags f) : m_handle{cast(luaL_newstate())} {
   if ((f & flags::open_libs).any()) luaL_openlibs(cast(m_handle));
@@ -35,6 +52,8 @@ void State::dostring(const char* str) {
   if (res) throw std::runtime_error("Failed to execute string");
 }
 
-void State::add_library(Library&& lib) {}
+void State::add_library(Library&& lib) {
+  luaL_requiref(cast(m_handle), lib.m_name.c_str(), open_nop, 1);
+}
 
 }  // namespace luacpp

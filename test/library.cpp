@@ -2,4 +2,13 @@
 
 #include <gtest/gtest.h>
 
+#include "luacpp/state.hpp"
+
 TEST(Ctor, Init) { luacpp::Library l{"mylib"}; }
+
+TEST(Ctor, AddLib) {
+  luacpp::State s{};
+  luacpp::Library mylib{"mylib"};
+  s.add_library(std::move(mylib));
+  s.dostring("mylib:foo()");
+}
