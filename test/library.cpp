@@ -6,7 +6,7 @@
 
 TEST(Ctor, Init) { luacpp::Library l{"mylib"}; }
 
-void foo() {}
+void foo() { std::cerr << "foo called :o\n"; }
 
 TEST(Ctor, AddLib) {
   luacpp::State s{};

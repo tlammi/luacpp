@@ -10,8 +10,12 @@ namespace luacpp {
 
 namespace {
 
-int bar(lua_State* _) {
+int bar(lua_State* s) {
   std::cerr << "bar called!!!!\n";
+  lua_pushstring(s, "foo");
+  lua_gettable(s, LUA_REGISTRYINDEX);
+  detail::Func* f = (detail::Func*)lua_touserdata(s, -1);
+  (*f)(cast(s));
   return 0;
 }
 
@@ -53,6 +57,9 @@ void State::dostring(const char* str) {
 }
 
 void State::add_library(Library&& lib) {
+  lua_pushstring(cast(m_handle), "foo");
+  lua_pushlightuserdata(cast(m_handle), lib.m_functions.at(0).second.get());
+  lua_settable(cast(m_handle), LUA_REGISTRYINDEX);
   luaL_requiref(cast(m_handle), lib.m_name.c_str(), open_nop, 1);
 }
 
