@@ -1,2 +1,2 @@
 
-SRCS += files('state.cpp')
+SRCS += files('state.cpp', 'library.cpp')

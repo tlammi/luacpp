@@ -2,23 +2,10 @@
 
 #include <stdexcept>
 
-extern "C" {
-#include <lauxlib.h>
-#include <lua.h>
-#include <lualib.h>
-}
+#include "cast.hpp"
+#include "lua.hpp"
 
 namespace luacpp {
-namespace {
-detail::tags::state_t* cast(lua_State* s) {
-  return reinterpret_cast<detail::tags::state_t*>(s);
-}
-
-lua_State* cast(detail::tags::state_t* s) {
-  return reinterpret_cast<lua_State*>(s);
-}
-
-}  // namespace
 
 State::State(flags::StateFlags f) : m_handle{cast(luaL_newstate())} {
   if ((f & flags::open_libs).any()) luaL_openlibs(cast(m_handle));
@@ -42,4 +29,12 @@ void State::dofile(const char* path) {
   auto res = luaL_dofile(cast(m_handle), path);
   if (res) throw std::runtime_error("Failed to execute file");
 }
+
+void State::dostring(const char* str) {
+  auto res = luaL_dostring(cast(m_handle), str);
+  if (res) throw std::runtime_error("Failed to execute string");
+}
+
+void State::add_library(Library&& lib) {}
+
 }  // namespace luacpp
