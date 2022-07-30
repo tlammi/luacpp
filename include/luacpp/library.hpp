@@ -1,5 +1,7 @@
 #pragma once
 
+#include <luacpp/detail/func.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -20,12 +22,15 @@ class Library {
 
   template <class C>
   void add_function(const char* name, C&& callback) {
-    m_functions.emplace_back(name);
+    m_functions.emplace_back(name,
+                             new detail::FuncImpl(std::forward<C>(callback)));
   }
 
  private:
   std::string m_name;
-  std::vector<std::string> m_functions{};
+  using Vec =
+      std::vector<std::pair<std::string, std::unique_ptr<detail::Func>>>;
+  Vec m_functions{};
 };
 
 }  // namespace luacpp

@@ -6,9 +6,12 @@
 
 TEST(Ctor, Init) { luacpp::Library l{"mylib"}; }
 
+void foo() {}
+
 TEST(Ctor, AddLib) {
   luacpp::State s{};
   luacpp::Library mylib{"mylib"};
+  mylib.add_function("foo", &foo);
   s.add_library(std::move(mylib));
   s.dostring("mylib:foo()");
 }
