@@ -78,3 +78,13 @@ TEST(Lambda, IntVoid) {
   s.dostring("i=100; lib:f(i)");
   ASSERT_EQ(res, 100);
 }
+
+TEST(Lambda, IntIntVoid) {
+  luacpp::State s{};
+  luacpp::Library l{"lib"};
+  int res = 0;
+  l.add_function("f", [&](int i, int j) { res = i - j; });
+  s.add_library(std::move(l));
+  s.dostring("lib:f(100, 99)");
+  ASSERT_EQ(res, 1);
+}
