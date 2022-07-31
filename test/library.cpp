@@ -110,3 +110,20 @@ TEST(Lambda, ReturnTuple) {
   s.dostring("i, j = lib:get(); lib:set(i, j)");
   ASSERT_EQ(res, 42);
 }
+
+TEST(Lambda, Strings) {
+  luacpp::State s{};
+  luacpp::Library l{"lib"};
+  l.add_function("gen",
+                 [](std::string s, int i) -> std::tuple<std::string, int> {
+                   std::string out{};
+                   while (i--) out += s;
+                   return {out, i};
+                 });
+  std::string res{};
+  l.add_function("validate", [&](std::string s) { res = std::move(s); });
+
+  s.add_library(std::move(l));
+  s.dostring(R"(s, _ = lib:gen("foo", 3); lib:validate(s))");
+  ASSERT_EQ(res, "foofoofoo");
+}
