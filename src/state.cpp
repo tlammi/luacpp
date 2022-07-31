@@ -23,6 +23,11 @@ int callback_lua(lua_State* s) {
   return 0;
 }
 
+void create_libtable(lua_State* st, int field_count) {
+  luaL_checkversion(st);
+  lua_createtable(st, 0, field_count);
+}
+
 }  // namespace
 
 State::State(flags::StateFlags f) : m_handle{cast(luaL_newstate())} {
@@ -62,9 +67,10 @@ void State::add_library(Library&& lib) {
   if (!lua_toboolean(st, -1)) {  /* package not already loaded? */
     lua_pop(st, 1);              /* remove field */
     // luaL_newlib(st, funcs);
-    luaL_checkversion(st);
-    lua_createtable(st, 0, lib.m_functions.size());
-    // luaL_setfuncs(st, funcs, 0);
+    create_libtable(st, lib.m_functions.size());
+    // luaL_checkversion(st);
+    // lua_createtable(st, 0, lib.m_functions.size());
+    //  luaL_setfuncs(st, funcs, 0);
     for (const auto& [name, impl] : lib.m_functions) {
       lua_pushlightuserdata(st, impl.get());
       lua_pushcclosure(st, callback_lua, 1);
