@@ -5,6 +5,7 @@
 
 #include "cast.hpp"
 #include "lua.hpp"
+#include "luacpp/exception.hpp"
 
 namespace luacpp {
 
@@ -58,12 +59,12 @@ State::~State() {
 
 void State::dofile(const char* path) {
   auto res = luaL_dofile(cast(m_handle), path);
-  if (res) throw std::runtime_error("Failed to execute file");
+  if (res != LUA_OK) throw LuaException(m_handle);
 }
 
 void State::dostring(const char* str) {
   auto res = luaL_dostring(cast(m_handle), str);
-  if (res) throw std::runtime_error("Failed to execute string");
+  if (res != LUA_OK) throw LuaException(m_handle);
 }
 
 void State::add_library(Library&& lib) {
