@@ -54,3 +54,17 @@ TEST(MultipleFuncs, NoArgsVoid) {
   s.dostring("lib:lambda()");
   ASSERT_TRUE(lambda_called);
 }
+
+TEST(MultipleLibs, Simple) {
+  luacpp::State s{};
+  luacpp::Library lib1{"lib1"};
+  luacpp::Library lib2{"lib2"};
+  int counter = 0;
+  lib1.add_function("f", [&]() { ++counter; });
+  lib2.add_function("f", [&]() { counter *= 2; });
+  s.add_library(std::move(lib1));
+  s.add_library(std::move(lib2));
+
+  s.dostring("lib1:f(); lib2:f(); lib2:f(); lib1:f()");
+  ASSERT_EQ(counter, 5) << "Skipped functions or invoked in wrong order";
+}
