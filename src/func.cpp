@@ -13,6 +13,11 @@ std::tuple<int> pop_stack<int>(tags::state_t* state, int idx) {
 }
 
 template <>
+std::tuple<double> pop_stack<double>(tags::state_t* state, int idx) {
+  return luaL_checknumber(cast(state), idx);
+}
+
+template <>
 std::tuple<std::string> pop_stack<std::string>(tags::state_t* state, int idx) {
   size_t len{0};
   const char* str = lua_tolstring(cast(state), idx, &len);
@@ -22,6 +27,11 @@ std::tuple<std::string> pop_stack<std::string>(tags::state_t* state, int idx) {
 template <>
 void push_stack<int>(tags::state_t* s, const int& i) {
   lua_pushinteger(cast(s), i);
+}
+
+template <>
+void push_stack<double>(tags::state_t* s, const double& d) {
+  lua_pushnumber(cast(s), d);
 }
 
 template <>

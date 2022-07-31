@@ -127,3 +127,14 @@ TEST(Lambda, Strings) {
   s.dostring(R"(s, _ = lib:gen("foo", 3); lib:validate(s))");
   ASSERT_EQ(res, "foofoofoo");
 }
+
+TEST(Lambda, Number) {
+  luacpp::State s{};
+  luacpp::Library l{"lib"};
+  l.add_function("get", []() -> int { return 64; });
+  double res{};
+  l.add_function("set", [&](double d) { res = d; });
+  s.add_library(std::move(l));
+  s.dostring("i = lib:get(); lib:set(i*3)");
+  ASSERT_EQ(res, 192);
+}
