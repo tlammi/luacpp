@@ -34,6 +34,21 @@ template <class T>
 using callable_prototype_t = typename callable_prototype<T>::type;
 
 template <class T>
+struct invoke_result_impl;
+
+template <class R, class... Ps>
+struct invoke_result_impl<R(Ps...)> {
+  using type = R;
+};
+template <class T>
+struct invoke_result {
+  using type = typename invoke_result_impl<callable_prototype_t<T>>::type;
+};
+
+template <class T>
+using invoke_result_t = typename invoke_result<T>::type;
+
+template <class T>
 struct param_tuple_impl;
 
 template <class R, class... Ps>

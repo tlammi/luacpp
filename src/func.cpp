@@ -10,4 +10,9 @@ std::tuple<int> pop_stack<int>(tags::state_t* state, int idx) {
   return luaL_checkinteger(cast(state), idx);
 }
 
+template <>
+void push_stack<int>(tags::state_t* s, const int& i) {
+  lua_pushinteger(cast(s), i);
+}
+
 }  // namespace luacpp::detail

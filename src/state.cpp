@@ -20,8 +20,7 @@ namespace {
 int callback_lua(lua_State* s) {
   detail::Func* ptr =
       static_cast<detail::Func*>(lua_touserdata(s, lua_upvalueindex(1)));
-  (*ptr)(cast(s));
-  return 0;
+  return (*ptr)(cast(s));
 }
 
 void create_libtable(lua_State* st, int field_count) {

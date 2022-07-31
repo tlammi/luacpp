@@ -88,3 +88,25 @@ TEST(Lambda, IntIntVoid) {
   s.dostring("lib:f(100, 99)");
   ASSERT_EQ(res, 1);
 }
+
+TEST(Lambda, ReturnValue) {
+  luacpp::State s{};
+  luacpp::Library l{"lib"};
+  int res = 0;
+  l.add_function("get", []() -> int { return 42; });
+  l.add_function("set", [&](int i) { res = i; });
+  s.add_library(std::move(l));
+  s.dostring("i = lib:get(); lib:set(i)");
+  ASSERT_EQ(res, 42);
+}
+
+TEST(Lambda, ReturnTuple) {
+  luacpp::State s{};
+  luacpp::Library l{"lib"};
+  int res = 0;
+  l.add_function("get", []() -> std::tuple<int, int> { return {4, 2}; });
+  l.add_function("set", [&](int i, int j) { res = 10 * i + j; });
+  s.add_library(std::move(l));
+  s.dostring("i, j = lib:get(); lib:set(i, j)");
+  ASSERT_EQ(res, 42);
+}
