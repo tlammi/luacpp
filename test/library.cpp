@@ -13,8 +13,9 @@ TEST(Ctor, AddLib) {
   luacpp::Library mylib{"mylib"};
   bool called = false;
   mylib.add_function("foo", [&]() { called = true; });
+  mylib.add_function("bar", &foo);
   s.add_library(std::move(mylib));
   ASSERT_FALSE(called);
-  s.dostring("mylib:foo()");
+  s.dostring("mylib:foo(); mylib:bar()");
   ASSERT_TRUE(called);
 }

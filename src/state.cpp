@@ -33,8 +33,7 @@ void publish_functions(lua_State* st, const Iterable& container) {
   for (const auto& [name, func] : container) {
     lua_pushlightuserdata(st, func.get());
     lua_pushcclosure(st, callback_lua, 1);
-    lua_setfield(st, -3, name.c_str());
-    lua_pop(st, 1);  // pop upvalue
+    lua_setfield(st, -2, name.c_str());
   }
 }
 }  // namespace
