@@ -3,6 +3,11 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+// Used for silencing warnings
+#ifndef ARG_LUA_DIR
+#define ARG_LUA_DIR "not-set"
+#endif
+
 // ARG_LUA_DIR comes from command line
 const char* LUA_DIR = ARG_LUA_DIR;
 const char* LUA_EMPTY = ARG_LUA_DIR "empty.lua";
