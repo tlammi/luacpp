@@ -11,7 +11,10 @@ void foo() { std::cerr << "foo called :o\n"; }
 TEST(Ctor, AddLib) {
   luacpp::State s{};
   luacpp::Library mylib{"mylib"};
-  mylib.add_function("foo", &foo);
+  bool called = false;
+  mylib.add_function("foo", [&]() { called = true; });
   s.add_library(std::move(mylib));
+  ASSERT_FALSE(called);
   s.dostring("mylib:foo()");
+  ASSERT_TRUE(called);
 }

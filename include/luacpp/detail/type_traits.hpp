@@ -8,7 +8,7 @@ template <class... Ts>
 struct pack {};
 
 template <class T>
-struct callable_prototype;
+struct callable_prototype : callable_prototype<decltype(&T::operator())> {};
 
 template <class R, class... Ts>
 struct callable_prototype<R (*)(Ts...)> {
