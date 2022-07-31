@@ -18,7 +18,9 @@ template <class... Ts>
 struct pop_all_from_stack<std::tuple<Ts...>> {
   static std::tuple<Ts...> func(tags::state_t* s) {
     int i = 1;
-    return std::tuple_cat(pop_stack<Ts>(s, i++)...);
+    // NOTE: Start iteration from index 2. No idea why there is an extra table
+    // argument in the stack.
+    return std::tuple_cat(pop_stack<Ts>(s, ++i)...);
   }
 };
 

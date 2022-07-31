@@ -78,9 +78,8 @@ void State::add_library(Library&& lib) {
     create_libtable(st, lib.m_functions.size());
     publish_functions(st, lib.m_functions);
   }
-  lua_remove(st, -2);         /* remove LOADED table */
-  lua_pushvalue(st, -1);      /* copy of module */
   lua_setglobal(st, modname); /* _G[modname] = module */
+  lua_pop(st, 1);
 }
 
 }  // namespace luacpp

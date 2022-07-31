@@ -68,3 +68,13 @@ TEST(MultipleLibs, Simple) {
   s.dostring("lib1:f(); lib2:f(); lib2:f(); lib1:f()");
   ASSERT_EQ(counter, 5) << "Skipped functions or invoked in wrong order";
 }
+
+TEST(Lambda, IntVoid) {
+  luacpp::State s{};
+  luacpp::Library l{"lib"};
+  int res = 0;
+  l.add_function("f", [&](int i) { res = i; });
+  s.add_library(std::move(l));
+  s.dostring("i=100; lib:f(i)");
+  ASSERT_EQ(res, 100);
+}
