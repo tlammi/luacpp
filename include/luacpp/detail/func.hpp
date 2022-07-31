@@ -22,9 +22,7 @@ struct pop_stack_recurse_impl<std::tuple<Ts...>,
                               std::integer_sequence<int, Idxs...>> {
   static_assert(sizeof...(Ts) == sizeof...(Idxs));
   static std::tuple<Ts...> func(tags::state_t* s) {
-    // No idea why the offset needs to be two instead of one. There seems
-    // to be an extra "table" type argumet before other arguments.
-    return std::tuple_cat(pop_stack<Ts>(s, Idxs + 2)...);
+    return std::tuple_cat(pop_stack<Ts>(s, Idxs + 1)...);
   }
 };
 
