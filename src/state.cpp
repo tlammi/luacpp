@@ -75,24 +75,8 @@ void State::add_library(Library&& lib) {
   lua_getfield(st, -1, modname); /* LOADED[modname] */
   if (!lua_toboolean(st, -1)) {  /* package not already loaded? */
     lua_pop(st, 1);              /* remove field */
-    // luaL_newlib(st, funcs);
     create_libtable(st, lib.m_functions.size());
-    // luaL_checkversion(st);
-    // lua_createtable(st, 0, lib.m_functions.size());
-    //  luaL_setfuncs(st, funcs, 0);
     publish_functions(st, lib.m_functions);
-    // for (const auto& [name, impl] : lib.m_functions) {
-    //   lua_pushlightuserdata(st, impl.get());
-    //   lua_pushcclosure(st, callback_lua, 1);
-    //   lua_setfield(st, -3, name.c_str());
-    //   lua_pop(st, 1);  // pop upvalue
-    // }
-    //  implement this
-    //  lua_pushcfunction(L, openf);
-    //  lua_pushstring(st, modname);   /* argument to open function */
-    //  lua_call(st, 1, 1);            /* call 'openf' to open module */
-    //  lua_pushvalue(st, -1);         /* make copy of module (call result) */
-    //  lua_setfield(st, -3, modname); /* LOADED[modname] = module */
   }
   lua_remove(st, -2);         /* remove LOADED table */
   lua_pushvalue(st, -1);      /* copy of module */
