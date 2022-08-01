@@ -11,3 +11,4 @@ libluacpp = library('luacpp', SRCS, include_directories: INCDIRS + [include_dire
 libluacpp_dep = declare_dependency(link_with: libluacpp, include_directories: INCDIRS)
 
 subdir('test')
+subdir('sample')
