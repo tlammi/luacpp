@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <deque>
 #include <luacpp/detail/tags.hpp>
 #include <luacpp/library.hpp>
 
@@ -30,6 +31,7 @@ class State {
 
  private:
   detail::tags::state_t* m_handle;
+  std::deque<Library> m_libs{};
 };
 
 }  // namespace luacpp

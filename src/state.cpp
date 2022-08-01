@@ -79,6 +79,7 @@ void State::add_library(Library&& lib) {
   }
   lua_setglobal(st, modname); /* _G[modname] = module */
   lua_pop(st, 1);
+  m_libs.push_back(std::move(lib));
 }
 
 }  // namespace luacpp
