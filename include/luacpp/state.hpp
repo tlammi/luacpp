@@ -4,6 +4,7 @@
 #include <deque>
 #include <luacpp/detail/tags.hpp>
 #include <luacpp/library.hpp>
+#include <stdexcept>
 
 namespace luacpp {
 namespace flags {
@@ -29,9 +30,33 @@ class State {
 
   void add_library(Library&& lib);
 
+  /**
+   * Add a global variable to Lua
+   *
+   * If the symbol does not exist, a new one is created. Existing symbols are
+   * overwritten.
+   *
+   * \tparam Variable (int, double, std::string, ...) or callable. Former
+   * creates a variable, latter a function
+   * \p name Symbol name
+   * \p value Value to store in the symbol
+   */
+  template <class Val>
+  void set_global(const char* name, Val&& value) {
+    if constexpr (detail::is_callable_v<Val>) {
+      m_global_funcs.emplace_back(
+          new detail::FuncImpl{std::forward<Val>(value)});
+      set_global_func(name, m_global_funcs.back().get());
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
+
  private:
+  void set_global_func(const char* name, detail::Func* f);
   detail::tags::state_t* m_handle;
   std::deque<Library> m_libs{};
+  std::deque<std::unique_ptr<detail::Func>> m_global_funcs{};
 };
 
 }  // namespace luacpp

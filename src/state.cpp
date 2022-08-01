@@ -82,4 +82,11 @@ void State::add_library(Library&& lib) {
   m_libs.push_back(std::move(lib));
 }
 
+void State::set_global_func(const char* name, detail::Func* f) {
+  lua_State* st = cast(m_handle);
+  lua_pushlightuserdata(st, f);
+  lua_pushcclosure(st, callback_lua, 1);
+  lua_setglobal(st, name);
+}
+
 }  // namespace luacpp

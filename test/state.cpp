@@ -44,3 +44,17 @@ TEST(DoString, NoLibs) {
   static constexpr const char* lua_str = "a = a; print(a+1)";
   ASSERT_ANY_THROW(s.dostring(lua_str));
 }
+
+TEST(Globals, Function) {
+  luacpp::State s{};
+  s.set_global("get", []() -> int { return 42; });
+  int res = 0;
+  s.set_global("set", [&](int i) { res = i; });
+  s.dostring("i = get(); set(i)");
+  ASSERT_EQ(res, 42);
+}
+
+TEST(Globals, Int) {
+  luacpp::State s{};
+  s.set_global("foo", 100);
+}
