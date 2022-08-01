@@ -7,8 +7,12 @@ namespace luacpp::detail {
 template <class... Ts>
 struct pack {};
 
+template <class T, class = void>
+struct callable_prototype;
+
 template <class T>
-struct callable_prototype : callable_prototype<decltype(&T::operator())> {};
+struct callable_prototype<T, std::void_t<decltype(&T::operator())>>
+    : callable_prototype<decltype(&T::operator())> {};
 
 template <class R, class... Ts>
 struct callable_prototype<R (*)(Ts...)> {
@@ -47,6 +51,15 @@ struct invoke_result {
 
 template <class T>
 using invoke_result_t = typename invoke_result<T>::type;
+
+template <class T, class = void>
+struct is_callable : std::false_type {};
+
+template <class T>
+struct is_callable<T, std::void_t<callable_prototype_t<T>>> : std::true_type {};
+
+template <class T>
+constexpr bool is_callable_v = is_callable<T>::value;
 
 template <class T>
 struct param_tuple_impl;
