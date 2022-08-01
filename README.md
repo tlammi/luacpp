@@ -41,8 +41,8 @@ int main(){
     luacpp::State s{luacpp::flags::open_libs}; // open_libs opens the "standard" libraries such as `io` and `math`
     luacpp::Library l{"mylib"};
     l.add_function("get", []() -> std::tuple<int, std::string> {return {42, "foo"};});
-	l.add_function("set1", [](int i){std::cerr << i << '\n'; });
-	l.add_function("set2", [](std::string s){std::cerr << s << '\n'; });
+    l.add_function("set1", [](int i){std::cerr << i << '\n'; });
+    l.add_function("set2", [](std::string s){std::cerr << s << '\n'; });
 
     s.add_library(std::move(l));
     s.dostring("i, s = mylib.get(); mylib.set1(i); mylib.set2(s)");
