@@ -8,9 +8,11 @@
 
 namespace luacpp::detail {
 
+// TODO: Move to a separate file
 template <class T>
 std::tuple<T> pop_stack(tags::state_t* s, int index);
 
+// TODO: Move to a separate file
 template <class T>
 void push_stack(tags::state_t* s, const T& t);
 

@@ -89,4 +89,8 @@ void State::set_global_func(const char* name, detail::Func* f) {
   lua_setglobal(st, name);
 }
 
+void State::push_global(const char* name) {
+  lua_setglobal(cast(m_handle), name);
+}
+
 }  // namespace luacpp

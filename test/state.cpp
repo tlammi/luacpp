@@ -57,4 +57,8 @@ TEST(Globals, Function) {
 TEST(Globals, Int) {
   luacpp::State s{};
   s.set_global("foo", 100);
+  int res = 0;
+  s.set_global("respond", [&](int i) { res = i; });
+  s.dostring("respond(foo)");
+  ASSERT_EQ(res, 100);
 }

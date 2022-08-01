@@ -48,12 +48,14 @@ class State {
           new detail::FuncImpl{std::forward<Val>(value)});
       set_global_func(name, m_global_funcs.back().get());
     } else {
-      throw std::runtime_error("Not implemented");
+      detail::push_stack<Val>(m_handle, value);
+      push_global(name);
     }
   }
 
  private:
   void set_global_func(const char* name, detail::Func* f);
+  void push_global(const char* name);
   detail::tags::state_t* m_handle;
   std::deque<Library> m_libs{};
   std::deque<std::unique_ptr<detail::Func>> m_global_funcs{};
