@@ -22,4 +22,34 @@ TEST(State, EvalStr) {
     int i = s.evalstr<int>("100");
     ASSERT_EQ(i, 100);
     ASSERT_EQ(s.stack_size(), 0);
+
+    i += s.evalstr<int>("1 + 3");
+    ASSERT_EQ(i, 104);
+    ASSERT_EQ(s.stack_size(), 0);
 }
+
+TEST(DoStr, Empty) {
+    lp::State s{};
+    s.dostr("");
+}
+
+TEST(DoStr, Func) {
+    lp::State s{};
+    s.dostr(R"(
+function add(x, y)
+  return x + y
+end
+x = 100
+y = 12
+z = add(x, y)
+)");
+}
+
+TEST(DoStr, GlobalRoundTrip) {
+    lp::State s{};
+    s.set_global("x", 1);
+    s.dostr("x = x + 10");
+    auto x = s.get_global<lp::Int>("x");
+    ASSERT_EQ(x, 11);
+}
+

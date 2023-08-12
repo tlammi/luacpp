@@ -59,6 +59,19 @@ class State {
         }
     }
 
+    template <class T>
+    T get_global(const char* name) {
+        get_global_to_stack(name);
+        if constexpr (std::is_integral_v<T>) {
+            return pop_stack_int().value();
+        } else if constexpr (std::is_floating_point_v<T>) {
+            return pop_stack_float().value();
+        } else if constexpr (std::is_same_v<T, std::string>) {
+            return pop_stack_str();
+        } else {
+            [] { static_assert(false); };
+        }
+    }
 
     [[nodiscard]] size_t stack_size() const noexcept;
 
@@ -71,6 +84,8 @@ class State {
     void set_global_int(const char* name, Int i);
     void set_global_float(const char* name, Double d);
     void set_global_str(const char* name, std::string_view s);
+
+    void get_global_to_stack(const char* name);
 
     std::optional<Int> pop_stack_int();
     std::optional<Double> pop_stack_float();

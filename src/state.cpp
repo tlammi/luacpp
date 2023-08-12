@@ -63,6 +63,10 @@ void State::set_global_str(const char* name, std::string_view s) {
     lua_setglobal(cast(m_st), name);
 }
 
+void State::get_global_to_stack(const char* name) {
+    lua_getglobal(cast(m_st), name);
+}
+
 std::optional<Int> State::pop_stack_int() {
     int is_int{false};
     auto i = lua_tointegerx(cast(m_st), -1, &is_int);
