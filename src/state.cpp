@@ -1,96 +1,94 @@
-#include "luacpp/state.hpp"
-
-#include <iostream>
-#include <stdexcept>
-
 #include "cast.hpp"
-#include "lua.hpp"
-#include "luacpp/exception.hpp"
+
+#include <lauxlib.h>
+#include <lua.h>
+#include <luacpp/state.hpp>
+#include <lualib.h>
 
 namespace luacpp {
 
-namespace {
-
-/**
- * Callback called for all lua functions
- *
- * The actual function implementation is stored in upvalues and this callback
- * then calls the actual implementation.
- */
-int callback_lua(lua_State* s) {
-  detail::Func* ptr =
-      static_cast<detail::Func*>(lua_touserdata(s, lua_upvalueindex(1)));
-  return (*ptr)(cast(s));
+State::State(StateFlags opts) : m_st{cast(luaL_newstate())} {
+    if ((opts & flags::open_libs).any()) {
+        luaL_openlibs(cast(m_st));
+    }
 }
 
-void create_libtable(lua_State* st, int field_count) {
-  luaL_checkversion(st);
-  lua_createtable(st, 0, field_count);
+State::State(State&& other) noexcept {
+    std::swap(m_st, other.m_st);
 }
 
-template <class Iterable>
-void publish_functions(lua_State* st, const Iterable& container) {
-  for (const auto& [name, func] : container) {
-    lua_pushlightuserdata(st, func.get());
-    lua_pushcclosure(st, callback_lua, 1);
-    lua_setfield(st, -2, name.c_str());
-  }
-}
-}  // namespace
-
-State::State(flags::StateFlags f) : m_handle{cast(luaL_newstate())} {
-  if ((f & flags::open_libs).any()) luaL_openlibs(cast(m_handle));
-}
-
-State::State(State&& s) noexcept : m_handle{s.m_handle} {
-  s.m_handle = nullptr;
-}
-
-State& State::operator=(State&& s) noexcept {
-  m_handle = s.m_handle;
-  s.m_handle = nullptr;
-  return *this;
+State& State::operator=(State&& other) noexcept {
+    std::swap(m_st, other.m_st);
+    return *this;
 }
 
 State::~State() {
-  if (m_handle) lua_close(cast(m_handle));
+    if (m_st)
+        lua_close(cast(m_st));
 }
 
 void State::dofile(const char* path) {
-  auto res = luaL_dofile(cast(m_handle), path);
-  if (res != LUA_OK) throw LuaException(m_handle);
+    luaL_dofile(cast(m_st), path);
 }
 
-void State::dostring(const char* str) {
-  auto res = luaL_dostring(cast(m_handle), str);
-  if (res != LUA_OK) throw LuaException(m_handle);
+void State::dostr(const char* str) {
+    luaL_dostring(cast(m_st), str);
 }
 
-void State::add_library(Library&& lib) {
-  lua_State* st = cast(m_handle);
-  const char* modname = lib.m_name.c_str();
-
-  luaL_getsubtable(st, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
-  lua_getfield(st, -1, modname); /* LOADED[modname] */
-  if (!lua_toboolean(st, -1)) {  /* package not already loaded? */
-    lua_pop(st, 1);              /* remove field */
-    create_libtable(st, lib.m_functions.size());
-    publish_functions(st, lib.m_functions);
-  }
-  lua_setglobal(st, modname); /* _G[modname] = module */
-  lua_pop(st, 1);
-  m_libs.push_back(std::move(lib));
+size_t State::stack_size() const noexcept {
+    return lua_gettop(cast(m_st));
 }
 
-void State::set_global_func(const char* name, detail::Func* f) {
-  lua_State* st = cast(m_handle);
-  lua_pushlightuserdata(st, f);
-  lua_pushcclosure(st, callback_lua, 1);
-  lua_setglobal(st, name);
+void State::loadstring(const char* str) {
+    luaL_loadstring(cast(m_st), str);
 }
 
-void State::push_global(const char* name) {
-  lua_setglobal(cast(m_handle), name);
+void State::pcall(int nargs, int nres) {
+    lua_pcall(cast(m_st), nargs, nres, 0);
 }
 
-}  // namespace luacpp
+
+void State::set_global_int(const char* name, Int i) {
+    lua_pushinteger(cast(m_st), i);
+    lua_setglobal(cast(m_st), name);
+}
+
+void State::set_global_float(const char* name, Double d) {
+    lua_pushnumber(cast(m_st), d);
+    lua_setglobal(cast(m_st), name);
+}
+
+void State::set_global_str(const char* name, std::string_view s) {
+    lua_pushlstring(cast(m_st), s.data(), s.length());
+    lua_setglobal(cast(m_st), name);
+}
+
+std::optional<Int> State::pop_stack_int() {
+    int is_int{false};
+    auto i = lua_tointegerx(cast(m_st), -1, &is_int);
+    if (is_int) {
+        lua_pop(cast(m_st), 1);
+        return i;
+    }
+    return std::nullopt;
+}
+
+std::optional<Double> State::pop_stack_float() {
+    int is_num{false};
+    auto d = lua_tonumberx(cast(m_st), -1, &is_num);
+    if (is_num) {
+        lua_pop(cast(m_st), 1);
+        return d;
+    }
+    return std::nullopt;
+}
+
+std::string State::pop_stack_str() {
+    size_t len{0};
+    const auto* s = lua_tolstring((cast(m_st)), -1, &len);
+    std::string res(s, len);
+    lua_pop(cast(m_st), 1);
+    return res;
+}
+
+} // namespace luacpp

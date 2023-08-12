@@ -1,4 +1,4 @@
-project('luacpp', 'cpp', 'c', default_options: ['default_library=static']) 
+project('luacpp', 'cpp', 'c', default_options: ['default_library=static', 'cpp_std=c++20']) 
 
 lua_dep = dependency('lua5.4')
 
@@ -11,4 +11,3 @@ libluacpp = library('luacpp', SRCS, include_directories: INCDIRS + [include_dire
 libluacpp_dep = declare_dependency(link_with: libluacpp, include_directories: INCDIRS)
 
 subdir('test')
-subdir('sample')

@@ -1,7 +1,8 @@
 #pragma once
 
-namespace luacpp::detail::tags {
+namespace luacpp::detail {
 
 struct state_t {};
 
-}  // namespace luacpp::detail::tags
+
+} // namespace luacpp::detail
