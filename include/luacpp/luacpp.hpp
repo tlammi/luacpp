@@ -3,4 +3,3 @@
 #include <luacpp/state.hpp>
 
 namespace luacpp {}
-

@@ -39,6 +39,12 @@ size_t State::stack_size() const noexcept {
     return lua_gettop(cast(m_st));
 }
 
+#if defined(LUACPP_LUA_HANDLE)
+lua_State* State::lua_state() const noexcept {
+    return cast(m_st);
+}
+#endif
+
 void State::loadstring(const char* str) {
     luaL_loadstring(cast(m_st), str);
 }

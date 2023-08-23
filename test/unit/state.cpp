@@ -33,7 +33,7 @@ TEST(DoStr, Empty) {
     s.dostr("");
 }
 
-TEST(DoStr, Func) {
+TEST(DoStr, CallFunc) {
     lp::State s{};
     s.dostr(R"(
 function add(x, y)

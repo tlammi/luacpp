@@ -2,6 +2,7 @@
 
 #include <bitset>
 #include <luacpp/detail/tags.hpp>
+#include <luacpp/stack.hpp>
 #include <luacpp/types.hpp>
 #include <optional>
 #include <string_view>
@@ -12,6 +13,11 @@ namespace flags {
 constexpr StateFlags open_libs = 0b1;
 } // namespace flags
 
+/**
+ * \brief Root object for Lua context
+ *
+ * This object contains e.g. Lua stack and all functions etc.
+ * */
 class State {
   public:
     explicit State(StateFlags opts = 0);
@@ -23,7 +29,6 @@ class State {
     State& operator=(State&&) noexcept;
 
     ~State();
-
 
     void dofile(const char* path);
     void dofile(const std::string& str) {
@@ -46,6 +51,14 @@ class State {
         return pop_stack_int().value();
     }
 
+    /**
+     * \brief Set value of a global symbol
+     *
+     * This assigns the given value to the variable and creates the variable does not exist.
+     *
+     * \param name Symbol name
+     * \param t value to assign
+     * */
     template <class T>
     void set_global(const char* name, const T& t) {
         if constexpr (std::is_integral_v<T>) {
@@ -59,6 +72,9 @@ class State {
         }
     }
 
+    /**
+     * \brief Read value from a global symbol
+     * */
     template <class T>
     T get_global(const char* name) {
         get_global_to_stack(name);
@@ -73,7 +89,24 @@ class State {
         }
     }
 
+    /**
+     * \brief Number of entries in Lua stack.
+     *
+     * This is mostly used for testing
+     * */
     [[nodiscard]] size_t stack_size() const noexcept;
+
+#if defined(LUACPP_LUA_HANDLE)
+    /**
+     * \brief Access raw lua state
+     * */
+    lua_State* lua_state() const noexcept;
+#endif
+
+
+    Stack stack() noexcept {
+        return Stack{*m_st};
+    }
 
 
   private:
