@@ -8,17 +8,16 @@
 
 namespace luacpp {
 
-class Any;
+class Ref;
 
 class Table {
   public:
-    Table(detail::state_t* st, int idx) : m_st{st}, m_idx{idx} {}
-
-    Any operator[](Int i);
-    Any operator[](std::string_view k);
+    Ref operator[](Int i);
+    Ref operator[](std::string_view k);
 
 
   private:
+    Table(detail::state_t* st, int idx) : m_st{st}, m_idx{idx} {}
     detail::state_t* m_st{};
     int m_idx{};
 };
