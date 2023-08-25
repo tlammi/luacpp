@@ -1,2 +1,2 @@
 
-SRCS += files('types.cpp', 'state.cpp', 'table.cpp', 'stack.cpp')
+SRCS += files('types.cpp', 'state.cpp', 'table.cpp', 'stack.cpp', 'ref.cpp')

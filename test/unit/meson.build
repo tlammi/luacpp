@@ -1,4 +1,4 @@
-test_files = files('state.cpp', 'stack.cpp')
+test_files = files('state.cpp', 'stack.cpp', 'ref.cpp')
 
 test_opts = {
   'dependencies': [dependency('gtest'), dependency('gtest_main'), libluacpp_dep],

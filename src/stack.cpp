@@ -58,5 +58,11 @@ void Stack::pop(size_t count) {
     }
     lua_settop(cast(m_st), static_cast<int>(newsz));
 }
+std::optional<Ref> Stack::ref(int idx) const {
+    if (idx < 1 || static_cast<size_t>(idx) > size()) {
+        return std::nullopt;
+    }
+    return Ref{m_st, idx};
+}
 
 } // namespace luacpp

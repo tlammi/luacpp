@@ -7,10 +7,19 @@
 namespace luacpp {
 /**
  * \param Sum type containing any type from Lua
+ *
+ * This behaves like \a Ref but holds the value directly, not a reference to the stack.
+ * \a Ref is kind of a lazily evaluated Any
  * */
 class Any {
   public:
-    Any() : m_nil{} {}
+    Any() = default;
+
+    Any(const Any& other) = default;
+    Any& operator=(const Any& other) = default;
+
+    Any(Any&&) noexcept = default;
+    Any& operator=(Any&&) noexcept = default;
 
     ~Any() {
         using enum TypeId;
@@ -22,7 +31,7 @@ class Any {
                 std::destroy_at(&m_bool);
                 return;
             case TypeId::LightUserdata:
-                throw std::runtime_error("not implemented");
+                std::terminate();
             case TypeId::Number:
                 std::destroy_at(&m_dbl);
                 return;
@@ -33,8 +42,8 @@ class Any {
             case TypeId::Func:
             case TypeId::Userdata:
             case TypeId::Thread:
-            case TypeId::COUNT_:
-                throw std::runtime_error("not implemented");
+            case TypeId::Unknown:
+                std::terminate();
                 break;
         }
     }
@@ -82,12 +91,14 @@ class Any {
     }
 
   private:
-    union {
+    union Union {
         Nil m_nil;
         Bool m_bool;
         Double m_dbl;
         std::string_view m_str;
     };
+
+    static_assert(std::is_trivially_copyable_v<Union>);
 
     TypeId m_id{TypeId::Nil};
 };

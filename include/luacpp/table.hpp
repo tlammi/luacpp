@@ -15,7 +15,6 @@ class Table {
     Ref operator[](Int i);
     Ref operator[](std::string_view k);
 
-
   private:
     Table(detail::state_t* st, int idx) : m_st{st}, m_idx{idx} {}
     detail::state_t* m_st{};

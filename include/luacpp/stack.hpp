@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <luacpp/detail/tags.hpp>
+#include <luacpp/ref.hpp>
 #include <luacpp/types.hpp>
 #include <optional>
 
@@ -54,6 +55,9 @@ class Stack {
 
 
     void pop(size_t count = 1);
+
+
+    std::optional<Ref> ref(int idx) const;
 
   private:
     explicit Stack(detail::state_t& st) : m_st{&st} {}

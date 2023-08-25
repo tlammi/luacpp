@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <variant>
 
@@ -9,7 +10,7 @@ namespace luacpp {
 /**
  * \brief Type IDs for Lua types
  * */
-enum class TypeId {
+enum class TypeId : uint8_t {
     Nil,
     Bool,
     LightUserdata,
@@ -19,7 +20,7 @@ enum class TypeId {
     Func,
     Userdata,
     Thread,
-    COUNT_,
+    Unknown,
 };
 
 TypeId to_type_id(int i);
