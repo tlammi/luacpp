@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 namespace luacpp {
+
 /**
  * \param Sum type containing any type from Lua
  *
@@ -13,40 +14,17 @@ namespace luacpp {
  * */
 class Any {
   public:
-    Any() = default;
+    Any() : m_nil{} {}
+    explicit Any(Double d) : m_dbl{d}, m_id{TypeId::Number} {}
+    explicit Any(std::string_view s) : m_str{s}, m_id{TypeId::String} {}
 
-    Any(const Any& other) = default;
-    Any& operator=(const Any& other) = default;
+    Any(const Any& other) = delete;
+    Any& operator=(const Any& other) = delete;
 
-    Any(Any&&) noexcept = default;
-    Any& operator=(Any&&) noexcept = default;
+    Any(Any&&) noexcept = delete;
+    Any& operator=(Any&&) noexcept = delete;
 
-    ~Any() {
-        using enum TypeId;
-        switch (m_id) {
-            case Nil:
-                std::destroy_at(&m_nil);
-                return;
-            case Bool:
-                std::destroy_at(&m_bool);
-                return;
-            case TypeId::LightUserdata:
-                std::terminate();
-            case TypeId::Number:
-                std::destroy_at(&m_dbl);
-                return;
-            case TypeId::String:
-                std::destroy_at(&m_str);
-                return;
-            case TypeId::Table:
-            case TypeId::Func:
-            case TypeId::Userdata:
-            case TypeId::Thread:
-            case TypeId::Unknown:
-                std::terminate();
-                break;
-        }
-    }
+    ~Any();
 
     explicit operator bool() const noexcept {
         return !is_nil();
@@ -60,7 +38,7 @@ class Any {
         return m_id == TypeId::Bool;
     }
 
-    [[nodiscard]] bool is_number() const noexcept {
+    [[nodiscard]] bool is_num() const noexcept {
         return m_id == TypeId::Number;
     }
 
@@ -84,21 +62,27 @@ class Any {
         return std::nullopt;
     }
 
-    [[nodiscard]] std::optional<Double> to_double() const noexcept {
-        if (is_number())
+    [[nodiscard]] std::optional<Double> to_num() const noexcept {
+        if (is_num())
             return m_dbl;
         return std::nullopt;
     }
 
+    [[nodiscard]] std::optional<std::string_view> to_str() const noexcept {
+        if (is_str()) {
+            return m_str;
+        }
+        return std::nullopt;
+    }
+
   private:
-    union Union {
+    union {
         Nil m_nil;
         Bool m_bool;
         Double m_dbl;
         std::string_view m_str;
     };
 
-    static_assert(std::is_trivially_copyable_v<Union>);
 
     TypeId m_id{TypeId::Nil};
 };

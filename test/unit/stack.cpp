@@ -14,6 +14,7 @@ class StackTest : public ::testing::Test {
 TEST_F(StackTest, Empty) {
     ASSERT_EQ(stack.size(), 0);
     ASSERT_EQ(stack.length(), 0);
+    ASSERT_EQ(stack.to_abs_idx(-1), 0);
     ASSERT_TRUE(stack.empty());
 }
 
@@ -21,6 +22,8 @@ TEST_F(StackTest, Push) {
     stack.push(100);
     ASSERT_EQ(stack.size(), 1);
     ASSERT_EQ(stack.length(), 1);
+    ASSERT_EQ(stack.to_abs_idx(-1), 1);
+    ASSERT_EQ(stack.to_abs_idx(-2), 0);
     ASSERT_FALSE(stack.empty());
 }
 

@@ -8,6 +8,8 @@
 
 namespace luacpp {
 
+class Table;
+
 class Stack {
     friend class State;
 
@@ -48,6 +50,7 @@ class Stack {
     void push_number(Double d) noexcept;
     std::string_view push_str(std::string_view str) noexcept;
     void push_nil() noexcept;
+    Table push_tbl() noexcept;
 
     std::optional<Int> to_int(int idx);
     std::optional<Double> to_num(int idx);
@@ -57,7 +60,19 @@ class Stack {
     void pop(size_t count = 1);
 
 
-    std::optional<Ref> ref(int idx) const;
+    /**
+     * \brief Convert relative (or abs) index to an absolute.
+     *
+     * E.g. converts -1 to lua_gettop() while leaves non-negative values untouched
+     * */
+    [[nodiscard]] int to_abs_idx(int idx) const noexcept;
+
+
+    [[nodiscard]] std::optional<Ref> ref(int idx) const;
+
+    detail::state_t* raw() noexcept {
+        return m_st;
+    }
 
   private:
     explicit Stack(detail::state_t& st) : m_st{&st} {}

@@ -2,6 +2,7 @@
 
 #include <bitset>
 #include <luacpp/detail/tags.hpp>
+#include <luacpp/detail/type_traits.hpp>
 #include <luacpp/stack.hpp>
 #include <luacpp/types.hpp>
 #include <optional>
@@ -68,7 +69,7 @@ class State {
         } else if constexpr (std::is_convertible_v<T, std::string_view>) {
             set_global_str(name, t);
         } else {
-            [] { static_assert(false); };
+            static_assert(detail::always_false_v<T>);
         }
     }
 
@@ -85,7 +86,7 @@ class State {
         } else if constexpr (std::is_same_v<T, std::string>) {
             return pop_stack_str();
         } else {
-            [] { static_assert(false); };
+            static_assert(detail::always_false_v<T>);
         }
     }
 

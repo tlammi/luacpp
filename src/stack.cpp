@@ -1,4 +1,5 @@
 #include <luacpp/stack.hpp>
+#include <luacpp/table.hpp>
 
 #include "cast.hpp"
 #include <limits>
@@ -24,6 +25,11 @@ std::string_view Stack::push_str(std::string_view str) noexcept {
 
 void Stack::push_nil() noexcept {
     lua_pushnil(cast(m_st));
+}
+
+Table Stack::push_tbl() noexcept {
+    lua_newtable(cast(m_st));
+    return Table{*this, to_abs_idx(-1)};
 }
 
 std::optional<Int> Stack::to_int(int idx) {
@@ -58,6 +64,7 @@ void Stack::pop(size_t count) {
     }
     lua_settop(cast(m_st), static_cast<int>(newsz));
 }
+
 std::optional<Ref> Stack::ref(int idx) const {
     if (idx < 1 || static_cast<size_t>(idx) > size()) {
         return std::nullopt;
@@ -65,4 +72,11 @@ std::optional<Ref> Stack::ref(int idx) const {
     return Ref{m_st, idx};
 }
 
+int Stack::to_abs_idx(int idx) const noexcept {
+    if (idx >= 0)
+        return idx;
+    int top = lua_gettop(cast(m_st));
+    // idx is negative
+    return top + idx + 1;
+}
 } // namespace luacpp
